@@ -1,366 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClickLink AI — Smart Product Links</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+<title>ClickLink AI — Smart Product Links</title>
 
-    body {
-      background: #f5f7fb;
-      color: #111827;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    header {
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 18px 6%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
 
-    .logo {
-      font-size: 25px;
-      font-weight: 800;
-      color: #111827;
-    }
+body{
+  background:#f7f7fb;
+  color:#111827;
+}
 
-    .logo span {
-      color: #6d28d9;
-    }
+header{
+  background:#fff;
+  border-bottom:1px solid #e5e7eb;
+  padding:18px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
 
-    .nav-btn {
-      border: 0;
-      background: #111827;
-      color: white;
-      padding: 10px 18px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+.logo{
+  font-size:24px;
+  font-weight:800;
+  color:#673de6;
+}
 
-    .hero {
-      padding: 70px 6% 40px;
-      text-align: center;
-      background: linear-gradient(135deg, #ffffff, #f1edff);
-    }
+.header-btn{
+  background:#673de6;
+  color:#fff;
+  text-decoration:none;
+  padding:11px 20px;
+  border-radius:10px;
+  font-weight:700;
+}
 
-    .badge {
-      display: inline-block;
-      background: #ede9fe;
-      color: #6d28d9;
-      padding: 8px 14px;
-      border-radius: 50px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 18px;
-    }
+.hero{
+  text-align:center;
+  padding:75px 20px 45px;
+}
 
-    .hero h1 {
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.05;
-      max-width: 900px;
-      margin: auto;
-      letter-spacing: -2px;
-    }
+.badge{
+  display:inline-block;
+  background:#eee9ff;
+  color:#673de6;
+  padding:8px 15px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.5px;
+  margin-bottom:18px;
+}
 
-    .hero h1 span {
-      color: #6d28d9;
-    }
+.hero h1{
+  font-size:52px;
+  line-height:1.1;
+  max-width:800px;
+  margin:auto;
+}
 
-    .hero p {
-      max-width: 650px;
-      margin: 20px auto 0;
-      color: #6b7280;
-      font-size: 18px;
-      line-height: 1.6;
-    }
+.hero h1 span{
+  color:#673de6;
+}
 
-    .app {
-      max-width: 1100px;
-      margin: 35px auto 70px;
-      padding: 0 20px;
-    }
+.hero p{
+  max-width:650px;
+  margin:20px auto;
+  color:#6b7280;
+  font-size:18px;
+  line-height:1.6;
+}
 
-    .card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 15px 45px rgba(0,0,0,0.06);
-    }
+.app{
+  max-width:900px;
+  margin:20px auto 80px;
+  padding:0 20px;
+}
 
-    .card h2 {
-      margin-bottom: 8px;
-    }
+.card{
+  background:#fff;
+  border-radius:22px;
+  padding:35px;
+  box-shadow:0 15px 45px rgba(0,0,0,.08);
+}
 
-    .sub {
-      color: #6b7280;
-      margin-bottom: 25px;
-    }
+.card h2{
+  font-size:28px;
+  margin-bottom:8px;
+}
 
-    .upload {
-      border: 2px dashed #c4b5fd;
-      background: #faf9ff;
-      border-radius: 16px;
-      padding: 35px 20px;
-      text-align: center;
-      cursor: pointer;
-      margin-bottom: 25px;
-    }
+.sub{
+  color:#6b7280;
+  margin-bottom:25px;
+}
 
-    .upload:hover {
-      background: #f5f3ff;
-    }
+.upload{
+  display:block;
+  border:2px dashed #cfc7f5;
+  border-radius:18px;
+  padding:35px;
+  text-align:center;
+  cursor:pointer;
+  background:#faf9ff;
+  margin-bottom:25px;
+}
 
-    .upload-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
+.upload:hover{
+  border-color:#673de6;
+}
 
-    #fileInput {
-      display: none;
-    }
+.upload-icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
 
-    #imagePreview {
-      max-width: 240px;
-      max-height: 240px;
-      border-radius: 14px;
-      margin-top: 15px;
-      display: none;
-      object-fit: cover;
-    }
+.upload input{
+  display:none;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
+.preview{
+  display:none;
+  text-align:center;
+  margin-bottom:25px;
+}
 
-    .field {
-      margin-bottom: 18px;
-    }
+.preview img{
+  max-width:260px;
+  max-height:260px;
+  border-radius:15px;
+  object-fit:cover;
+}
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
 
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
+.field{
+  display:flex;
+  flex-direction:column;
+}
 
-    input,
-    textarea,
-    select {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      outline: none;
-      font-size: 15px;
-      background: white;
-    }
+.field.full{
+  grid-column:1/-1;
+}
 
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
-    }
+label{
+  font-weight:700;
+  margin-bottom:8px;
+  font-size:14px;
+}
 
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
+input,textarea,select{
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:15px;
+  outline:none;
+}
 
-    .generate {
-      width: 100%;
-      border: 0;
-      background: #6d28d9;
-      color: white;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-top: 8px;
-    }
+input:focus,textarea:focus,select:focus{
+  border-color:#673de6;
+}
 
-    .generate:hover {
-      background: #5b21b6;
-    }
+textarea{
+  min-height:120px;
+  resize:vertical;
+}
 
-    .result {
-      display: none;
-      margin-top: 25px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 22px;
-    }
+.generate{
+  width:100%;
+  border:0;
+  margin-top:25px;
+  padding:16px;
+  border-radius:12px;
+  background:#673de6;
+  color:#fff;
+  font-size:17px;
+  font-weight:800;
+  cursor:pointer;
+}
 
-    .result h3 {
-      margin-bottom: 15px;
-    }
+.generate:hover{
+  background:#5630c9;
+}
 
-    .link-box {
-      display: flex;
-      gap: 10px;
-    }
+.result{
+  display:none;
+  margin-top:30px;
+  padding:25px;
+  border-radius:16px;
+  background:#f3f0ff;
+}
 
-    .link-box input {
-      background: white;
-    }
+.result h3{
+  margin-bottom:12px;
+}
 
-    .copy {
-      border: 0;
-      background: #111827;
-      color: white;
-      padding: 0 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-    }
+.link-box{
+  display:flex;
+  gap:10px;
+}
 
-    .preview {
-      margin-top: 25px;
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #e5e7eb;
-      padding: 20px;
-    }
+.link-box input{
+  background:#fff;
+}
 
-    .preview-card {
-      max-width: 450px;
-      margin: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      overflow: hidden;
-    }
+.copy{
+  border:0;
+  background:#111827;
+  color:#fff;
+  padding:0 18px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+}
 
-    .preview-card img {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      background: #f3f4f6;
-    }
+.product-preview{
+  margin-top:20px;
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
+}
 
-    .preview-info {
-      padding: 20px;
-    }
+.product-preview img{
+  width:180px;
+  height:180px;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+  margin-bottom:15px;
+}
 
-    .preview-info h2 {
-      margin-bottom: 8px;
-    }
+.buy{
+  display:inline-block;
+  margin-top:15px;
+  background:#673de6;
+  color:#fff;
+  padding:12px 22px;
+  border-radius:9px;
+  text-decoration:none;
+  font-weight:700;
+}
 
-    .price {
-      font-size: 25px;
-      font-weight: 800;
-      margin: 10px 0;
-    }
+.features{
+  max-width:1100px;
+  margin:0 auto 80px;
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
 
-    .buy {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background: #16a34a;
-      color: white;
-      text-decoration: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 800;
-      margin-top: 15px;
-    }
+.feature{
+  background:#fff;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,.05);
+}
 
-    .features {
-      max-width: 1100px;
-      margin: 0 auto 80px;
-      padding: 0 20px;
-    }
+.feature h3{
+  margin-bottom:10px;
+}
 
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
+.feature p{
+  color:#6b7280;
+  line-height:1.5;
+}
 
-    .feature {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 25px;
-    }
+footer{
+  text-align:center;
+  padding:30px;
+  background:#111827;
+  color:#9ca3af;
+}
 
-    .feature-icon {
-      font-size: 30px;
-      margin-bottom: 12px;
-    }
+@media(max-width:700px){
 
-    .feature p {
-      color: #6b7280;
-      margin-top: 8px;
-      line-height: 1.5;
-    }
+  .hero h1{
+    font-size:38px;
+  }
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #6b7280;
-      border-top: 1px solid #e5e7eb;
-      background: white;
-    }
+  .form-grid{
+    grid-template-columns:1fr;
+  }
 
-    @media (max-width: 700px) {
-      .grid,
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
+  .field.full{
+    grid-column:auto;
+  }
 
-      .field.full {
-        grid-column: auto;
-      }
+  .features{
+    grid-template-columns:1fr;
+  }
 
-      .hero {
-        padding-top: 45px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      .link-box {
-        flex-direction: column;
-      }
-
-      .copy {
-        padding: 13px;
-      }
-    }
-  </style>
+  .card{
+    padding:22px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">Click<span>Link</span> AI</div>
-  <button class="nav-btn" onclick="scrollToApp()">Create Link</button>
+
+  <div class="logo">
+    CLICKLINK AI
+  </div>
+
+  <a href="/auth.html" class="header-btn">
+    Login
+  </a>
+
 </header>
 
+
 <section class="hero">
-  <div class="badge">AI PRODUCT LINK PLATFORM</div>
+
+  <div class="badge">
+    AI PRODUCT LINK PLATFORM
+  </div>
 
   <h1>
     Turn Any Product Into a
@@ -368,26 +342,35 @@
   </h1>
 
   <p>
-    Upload your product, add the original product URL,
+    Upload your product photo, add your product details,
     and create a beautiful shareable product page in seconds.
   </p>
+
 </section>
 
-<section class="app" id="app">
+
+<section class="app">
 
   <div class="card">
 
     <h2>Create Your Product Link</h2>
 
     <p class="sub">
-      Add your product information below.
+      Start with your product photo. No original product URL required.
     </p>
+
+
+    <!-- PHOTO UPLOAD -->
 
     <label class="upload" for="fileInput">
 
-      <div class="upload-icon">📸</div>
+      <div class="upload-icon">
+        📸
+      </div>
 
-      <strong>Upload Product Photo</strong>
+      <strong>
+        Upload Product Photo
+      </strong>
 
       <p style="color:#6b7280;margin-top:7px;">
         JPG, PNG or WEBP
@@ -397,105 +380,184 @@
         type="file"
         id="fileInput"
         accept="image/*"
-      />
-
-      <img id="imagePreview" alt="Product preview" />
+      >
 
     </label>
 
-    <div class="grid">
+
+    <!-- PHOTO PREVIEW -->
+
+    <div class="preview" id="preview">
+
+      <img id="previewImage" alt="Product preview">
+
+    </div>
+
+
+    <!-- PRODUCT DETAILS -->
+
+    <div class="form-grid">
 
       <div class="field">
-        <label>Product Name</label>
+
+        <label>
+          Product Name
+        </label>
 
         <input
           type="text"
           id="productName"
-          placeholder="Example: Men's Black Jacket"
-        />
+          placeholder="Example: Men's Premium Jacket"
+        >
+
       </div>
 
+
       <div class="field">
-        <label>Price</label>
+
+        <label>
+          Price
+        </label>
 
         <input
           type="number"
-          id="price"
-          placeholder="799"
-        />
+          id="productPrice"
+          placeholder="₹ 999"
+        >
+
       </div>
 
+
       <div class="field">
-        <label>Category</label>
+
+        <label>
+          Category
+        </label>
 
         <select id="category">
 
-          <option value="">Select category</option>
-          <option>Men Fashion</option>
-          <option>Women Fashion</option>
-          <option>Electronics</option>
-          <option>Beauty</option>
-          <option>Home & Kitchen</option>
-          <option>Accessories</option>
-          <option>Other</option>
+          <option value="">
+            Select Category
+          </option>
+
+          <option>
+            Men Clothing
+          </option>
+
+          <option>
+            Women Clothing
+          </option>
+
+          <option>
+            Shoes
+          </option>
+
+          <option>
+            Accessories
+          </option>
+
+          <option>
+            Beauty
+          </option>
+
+          <option>
+            Electronics
+          </option>
+
+          <option>
+            Other
+          </option>
 
         </select>
+
       </div>
+
 
       <div class="field">
-        <label>Platform</label>
 
-        <select id="platform">
+        <label>
+          Selling Type
+        </label>
 
-          <option>Amazon</option>
-          <option>Flipkart</option>
-          <option>Meesho</option>
-          <option>eBay</option>
-          <option>Shopify</option>
-          <option>Other</option>
+        <select id="sellingType">
+
+          <option value="own">
+            My Own Product
+          </option>
+
+          <option value="affiliate">
+            Affiliate Product
+          </option>
+
+          <option value="reselling">
+            Reselling
+          </option>
 
         </select>
+
       </div>
+
 
       <div class="field full">
 
-        <label>Product Description</label>
+        <label>
+          Product Description
+        </label>
 
         <textarea
           id="description"
-          placeholder="Write a short product description..."
+          placeholder="Write a short description of your product..."
         ></textarea>
 
       </div>
 
+
       <div class="field full">
 
-        <label>Original Product URL</label>
+        <label>
+          Buy / Order Link
+          <span style="font-weight:400;color:#888;">
+            (Optional)
+          </span>
+        </label>
 
         <input
           type="url"
-          id="productUrl"
+          id="buyUrl"
           placeholder="https://example.com/product"
-        />
+        >
 
       </div>
 
     </div>
 
-    <button class="generate" onclick="generateLink()">
-      ⚡ Generate Smart Product Link
+
+    <button
+      class="generate"
+      onclick="generateLink()"
+    >
+      ✨ Create Smart Product Link
     </button>
 
-    <div class="result" id="result">
 
-      <h3>🎉 Your Smart Link is Ready</h3>
+    <!-- RESULT -->
+
+    <div
+      class="result"
+      id="result"
+    >
+
+      <h3>
+        🎉 Your Smart Product Link
+      </h3>
 
       <div class="link-box">
 
         <input
-          id="smartLink"
+          type="text"
+          id="generatedLink"
           readonly
-        />
+        >
 
         <button
           class="copy"
@@ -506,118 +568,118 @@
 
       </div>
 
-      <div class="preview">
 
-        <h3 style="margin-bottom:15px;">
-          Product Page Preview
-        </h3>
-
-        <div class="preview-card">
-
-          <img
-            id="previewImage"
-            alt="Product"
-          />
-
-          <div class="preview-info">
-
-            <h2 id="previewName">
-              Product Name
-            </h2>
-
-            <div
-              class="price"
-              id="previewPrice"
-            >
-              ₹0
-            </div>
-
-            <p
-              id="previewDescription"
-              style="color:#6b7280;line-height:1.5;"
-            ></p>
-
-            <a
-              id="buyButton"
-              class="buy"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Buy Now →
-            </a>
-
-          </div>
-
-        </div>
-
-      </div>
+      <div
+        class="product-preview"
+        id="productPreview"
+      ></div>
 
     </div>
 
   </div>
 
 </section>
+
 
 <section class="features">
 
-  <div class="features-grid">
+  <div class="feature">
 
-    <div class="feature">
-      <div class="feature-icon">📸</div>
-      <h3>Product Upload</h3>
-      <p>
-        Upload a product photo and create your product page quickly.
-      </p>
-    </div>
+    <h3>📸 Photo First</h3>
 
-    <div class="feature">
-      <div class="feature-icon">🔗</div>
-      <h3>Smart Links</h3>
-      <p>
-        Create a clean shareable link for every product.
-      </p>
-    </div>
+    <p>
+      Start by uploading a product photo.
+      You don't need an original product URL.
+    </p>
 
-    <div class="feature">
-      <div class="feature-icon">📊</div>
-      <h3>Analytics Ready</h3>
-      <p>
-        The platform is designed to add click tracking and analytics.
-      </p>
-    </div>
+  </div>
+
+
+  <div class="feature">
+
+    <h3>🔗 Smart Links</h3>
+
+    <p>
+      Create attractive product pages
+      that are easy to share.
+    </p>
+
+  </div>
+
+
+  <div class="feature">
+
+    <h3>📊 Analytics</h3>
+
+    <p>
+      Track clicks and product performance
+      as your business grows.
+    </p>
 
   </div>
 
 </section>
 
+
 <footer>
+
   © 2026 ClickLink AI — Upload. Create. Share. Earn.
+
 </footer>
+
 
 <script>
 
-  let uploadedImage = "";
+/* =====================================
+   SUPABASE
+===================================== */
 
-  const fileInput = document.getElementById("fileInput");
+const SUPABASE_URL =
+"https://sxvdtgwjktbzbbaprdyz.supabase.co";
 
-  const imagePreview = document.getElementById("imagePreview");
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_MY2ZBOkMQ5HQkHhg2au6eA_xzj7oct_";
 
-  fileInput.addEventListener("change", function () {
+const { createClient } = supabase;
 
-    const file = this.files[0];
+const supabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
-    if (!file) return;
+
+/* =====================================
+   PHOTO PREVIEW
+===================================== */
+
+let selectedImage = "";
+
+document
+  .getElementById("fileInput")
+  .addEventListener("change", function(event){
+
+    const file = event.target.files[0];
+
+    if(!file){
+      return;
+    }
+
+    if(!file.type.startsWith("image/")){
+      alert("Please upload an image.");
+      return;
+    }
 
     const reader = new FileReader();
 
-    reader.onload = function (event) {
+    reader.onload = function(e){
 
-      uploadedImage = event.target.result;
+      selectedImage = e.target.result;
 
-      imagePreview.src = uploadedImage;
+      document.getElementById("previewImage").src =
+        selectedImage;
 
-      imagePreview.style.display = "block";
+      document.getElementById("preview").style.display =
+        "block";
 
     };
 
@@ -626,144 +688,214 @@
   });
 
 
-  function generateSlug(text) {
+/* =====================================
+   CREATE SMART LINK
+===================================== */
 
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+async function generateLink(){
+
+  const name =
+    document.getElementById("productName").value.trim();
+
+  const price =
+    document.getElementById("productPrice").value.trim();
+
+  const category =
+    document.getElementById("category").value;
+
+  const sellingType =
+    document.getElementById("sellingType").value;
+
+  const description =
+    document.getElementById("description").value.trim();
+
+  const buyUrl =
+    document.getElementById("buyUrl").value.trim();
+
+
+  if(!selectedImage){
+
+    alert("Please upload a product photo.");
+
+    return;
 
   }
 
 
-  function generateLink() {
+  if(!name){
 
-    const name =
-      document.getElementById("productName").value.trim();
+    alert("Please enter product name.");
 
-    const price =
-      document.getElementById("price").value.trim();
+    return;
 
-    const description =
-      document.getElementById("description").value.trim();
+  }
 
-    const productUrl =
-      document.getElementById("productUrl").value.trim();
 
-    if (!name) {
+  if(!price){
 
-      alert("Please enter the product name.");
+    alert("Please enter product price.");
 
-      return;
+    return;
 
-    }
+  }
 
-    if (!productUrl) {
 
-      alert("Please enter the original product URL.");
+  const button =
+    document.querySelector(".generate");
 
-      return;
+  button.disabled = true;
 
-    }
+  button.textContent =
+    "Creating Smart Link...";
 
-    try {
 
-      new URL(productUrl);
-
-    } catch {
-
-      alert("Please enter a valid product URL.");
-
-      return;
-
-    }
-
-    const randomId =
-      Math.random().toString(36).substring(2, 8);
+  try{
 
     const slug =
-      generateSlug(name);
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g,"-")
+        .replace(/^-|-$/g,"")
+        +
+        "-"
+        +
+        Math.random()
+          .toString(36)
+          .substring(2,8);
 
-    const currentUrl =
+
+    const link =
       window.location.origin +
-      "/p/" +
-      slug +
-      "-" +
-      randomId;
+      "/?product=" +
+      encodeURIComponent(slug);
 
-    document.getElementById("smartLink").value =
-      currentUrl;
 
-    document.getElementById("previewName").textContent =
-      name;
+    /*
+      Current MVP creates the smart-link preview.
+      Permanent database storage will be connected
+      after Storage + authenticated product flow.
+    */
 
-    document.getElementById("previewPrice").textContent =
-      price ? "₹" + Number(price).toLocaleString("en-IN") : "Price not set";
 
-    document.getElementById("previewDescription").textContent =
-      description ||
-      "Discover this product through ClickLink AI.";
+    document.getElementById("generatedLink").value =
+      link;
 
-    document.getElementById("buyButton").href =
-      productUrl;
 
-    if (uploadedImage) {
+    document.getElementById("productPreview").innerHTML = `
 
-      document.getElementById("previewImage").src =
-        uploadedImage;
+      <img
+        src="${selectedImage}"
+        alt="${escapeHtml(name)}"
+      >
 
-    } else {
+      <h3>
+        ${escapeHtml(name)}
+      </h3>
 
-      document.getElementById("previewImage").src =
-        "https://via.placeholder.com/600x500?text=Product+Image";
+      <p style="margin-top:8px;color:#673de6;font-weight:800;">
+        ₹${escapeHtml(price)}
+      </p>
 
-    }
+      <p style="margin-top:10px;color:#6b7280;">
+        ${escapeHtml(description || "Product available now.")}
+      </p>
+
+      ${
+        buyUrl
+        ?
+        `<a
+          class="buy"
+          href="${escapeHtml(buyUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Buy Now
+        </a>`
+        :
+        `<button
+          class="buy"
+          onclick="alert('Order link will be added when this product is connected to a selling platform.')"
+        >
+          Buy Now
+        </button>`
+      }
+
+    `;
+
 
     document.getElementById("result").style.display =
       "block";
 
-    document.getElementById("result").scrollIntoView({
-      behavior: "smooth"
-    });
 
-  }
-
-
-  function copyLink() {
-
-    const link =
-      document.getElementById("smartLink").value;
-
-    navigator.clipboard.writeText(link)
-      .then(function () {
-
-        const button =
-          document.querySelector(".copy");
-
-        button.textContent = "Copied!";
-
-        setTimeout(function () {
-
-          button.textContent = "Copy";
-
-        }, 1500);
-
-      });
-
-  }
-
-
-  function scrollToApp() {
-
-    document.getElementById("app")
+    document.getElementById("result")
       .scrollIntoView({
-        behavior: "smooth"
+        behavior:"smooth"
       });
 
+
+  }catch(error){
+
+    alert(
+      "Something went wrong. Please try again."
+    );
+
   }
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "✨ Create Smart Product Link";
+
+}
+
+
+/* =====================================
+   COPY LINK
+===================================== */
+
+async function copyLink(){
+
+  const input =
+    document.getElementById("generatedLink");
+
+  try{
+
+    await navigator.clipboard.writeText(
+      input.value
+    );
+
+    alert("Smart Link copied!");
+
+  }catch(error){
+
+    input.select();
+
+    document.execCommand("copy");
+
+    alert("Smart Link copied!");
+
+  }
+
+}
+
+
+/* =====================================
+   SECURITY
+===================================== */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
 
 </script>
 
 </body>
-</html> 
+</html>
