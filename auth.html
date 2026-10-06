@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClickLink AI — Login</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f6f5ff;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      padding: 35px;
+      border-radius: 22px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.12);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: #6c3cff;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #6c3cff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #6c3cff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .switch span {
+      color: #6c3cff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <div class="logo">CLICKLINK AI</div>
+
+    <div class="subtitle">
+      Upload. Create. Share. Earn.
+    </div>
+
+    <h2 id="formTitle">Login</h2>
+
+    <input
+      type="text"
+      id="name"
+      placeholder="Full Name"
+      style="display:none;"
+    >
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Email address"
+      autocomplete="email"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <button id="submitBtn" onclick="submitForm()">
+      Login
+    </button>
+
+    <div class="switch">
+      <span id="switchText">Don't have an account?</span>
+      <span onclick="toggleMode()" id="switchBtn"> Create Account</span>
+    </div>
+
+    <div id="message"></div>
+
+  </div>
+
+<script>
+
+  // ==============================
+  // SUPABASE CONNECTION
+  // ==============================
+
+  const SUPABASE_URL =
+    "https://sxvdtgwjktbzbbaprdyz.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_MY2ZBOkMQ5HQkHhg2au6eA_xzj7oct_";
+
+  const { createClient } = supabase;
+
+  const client = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  // ==============================
+  // MODE
+  // ==============================
+
+  let signupMode = false;
+
+
+  function toggleMode() {
+
+    signupMode = !signupMode;
+
+    const title = document.getElementById("formTitle");
+    const name = document.getElementById("name");
+    const button = document.getElementById("submitBtn");
+    const switchText = document.getElementById("switchText");
+    const switchBtn = document.getElementById("switchBtn");
+
+    if (signupMode) {
+
+      title.textContent = "Create Account";
+
+      name.style.display = "block";
+
+      button.textContent = "Create Account";
+
+      switchText.textContent = "Already have an account?";
+
+      switchBtn.textContent = " Login";
+
+    } else {
+
+      title.textContent = "Login";
+
+      name.style.display = "none";
+
+      button.textContent = "Login";
+
+      switchText.textContent = "Don't have an account?";
+
+      switchBtn.textContent = " Create Account";
+    }
+
+    document.getElementById("message").textContent = "";
+  }
+
+
+  // ==============================
+  // LOGIN / SIGNUP
+  // ==============================
+
+  async function submitForm() {
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("message");
+
+    const button =
+      document.getElementById("submitBtn");
+
+
+    if (!email || !password) {
+
+      message.style.color = "red";
+      message.textContent =
+        "Please enter email and password.";
+
+      return;
+    }
+
+
+    if (signupMode && !name) {
+
+      message.style.color = "red";
+      message.textContent =
+        "Please enter your name.";
+
+      return;
+    }
+
+
+    button.disabled = true;
+    button.textContent = "Please wait...";
+
+
+    try {
+
+      if (signupMode) {
+
+        // ==========================
+        // SIGNUP
+        // ==========================
+
+        const { data, error } =
+          await client.auth.signUp({
+
+            email: email,
+            password: password,
+
+            options: {
+              data: {
+                full_name: name
+              }
+            }
+
+          });
+
+
+        if (error) throw error;
+
+
+        message.style.color = "green";
+
+        message.textContent =
+          "Account created! Check your email if confirmation is required.";
+
+        document.getElementById("password").value = "";
+
+      } else {
+
+        // ==========================
+        // LOGIN
+        // ==========================
+
+        const { data, error } =
+          await client.auth.signInWithPassword({
+
+            email: email,
+            password: password
+
+          });
+
+
+        if (error) throw error;
+
+
+        message.style.color = "green";
+
+        message.textContent =
+          "Login successful!";
+
+
+        setTimeout(() => {
+
+          window.location.href = "/";
+
+        }, 700);
+
+      }
+
+    } catch (error) {
+
+      message.style.color = "red";
+
+      message.textContent =
+        error.message;
+
+    }
+
+
+    button.disabled = false;
+
+    button.textContent =
+      signupMode
+        ? "Create Account"
+        : "Login";
+  }
+
+
+  // ==============================
+  // CHECK EXISTING SESSION
+  // ==============================
+
+  async function checkSession() {
+
+    const { data } =
+      await client.auth.getSession();
+
+    if (data.session) {
+
+      window.location.href = "/";
+
+    }
+  }
+
+  checkSession();
+
+</script>
+
+</body>
+</html>
