@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClickLink AI — Smart Product Links</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #111827;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .logo span {
+      color: #6d28d9;
+    }
+
+    .nav-btn {
+      border: 0;
+      background: #111827;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 70px 6% 40px;
+      text-align: center;
+      background: linear-gradient(135deg, #ffffff, #f1edff);
+    }
+
+    .badge {
+      display: inline-block;
+      background: #ede9fe;
+      color: #6d28d9;
+      padding: 8px 14px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: 1.05;
+      max-width: 900px;
+      margin: auto;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: #6d28d9;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 20px auto 0;
+      color: #6b7280;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 35px auto 70px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: #6b7280;
+      margin-bottom: 25px;
+    }
+
+    .upload {
+      border: 2px dashed #c4b5fd;
+      background: #faf9ff;
+      border-radius: 16px;
+      padding: 35px 20px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 25px;
+    }
+
+    .upload:hover {
+      background: #f5f3ff;
+    }
+
+    .upload-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    #imagePreview {
+      max-width: 240px;
+      max-height: 240px;
+      border-radius: 14px;
+      margin-top: 15px;
+      display: none;
+      object-fit: cover;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+      background: white;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .generate {
+      width: 100%;
+      border: 0;
+      background: #6d28d9;
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .generate:hover {
+      background: #5b21b6;
+    }
+
+    .result {
+      display: none;
+      margin-top: 25px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .result h3 {
+      margin-bottom: 15px;
+    }
+
+    .link-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .link-box input {
+      background: white;
+    }
+
+    .copy {
+      border: 0;
+      background: #111827;
+      color: white;
+      padding: 0 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .preview {
+      margin-top: 25px;
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+    }
+
+    .preview-card {
+      max-width: 450px;
+      margin: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .preview-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+
+    .preview-info {
+      padding: 20px;
+    }
+
+    .preview-info h2 {
+      margin-bottom: 8px;
+    }
+
+    .price {
+      font-size: 25px;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .buy {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: #16a34a;
+      color: white;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      margin-top: 15px;
+    }
+
+    .features {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 25px;
+    }
+
+    .feature-icon {
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
+
+    .feature p {
+      color: #6b7280;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    @media (max-width: 700px) {
+      .grid,
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .hero {
+        padding-top: 45px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .link-box {
+        flex-direction: column;
+      }
+
+      .copy {
+        padding: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Click<span>Link</span> AI</div>
+  <button class="nav-btn" onclick="scrollToApp()">Create Link</button>
+</header>
+
+<section class="hero">
+  <div class="badge">AI PRODUCT LINK PLATFORM</div>
+
+  <h1>
+    Turn Any Product Into a
+    <span>Smart Link.</span>
+  </h1>
+
+  <p>
+    Upload your product, add the original product URL,
+    and create a beautiful shareable product page in seconds.
+  </p>
+</section>
+
+<section class="app" id="app">
+
+  <div class="card">
+
+    <h2>Create Your Product Link</h2>
+
+    <p class="sub">
+      Add your product information below.
+    </p>
+
+    <label class="upload" for="fileInput">
+
+      <div class="upload-icon">📸</div>
+
+      <strong>Upload Product Photo</strong>
+
+      <p style="color:#6b7280;margin-top:7px;">
+        JPG, PNG or WEBP
+      </p>
+
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+      />
+
+      <img id="imagePreview" alt="Product preview" />
+
+    </label>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>Product Name</label>
+
+        <input
+          type="text"
+          id="productName"
+          placeholder="Example: Men's Black Jacket"
+        />
+      </div>
+
+      <div class="field">
+        <label>Price</label>
+
+        <input
+          type="number"
+          id="price"
+          placeholder="799"
+        />
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+
+        <select id="category">
+
+          <option value="">Select category</option>
+          <option>Men Fashion</option>
+          <option>Women Fashion</option>
+          <option>Electronics</option>
+          <option>Beauty</option>
+          <option>Home & Kitchen</option>
+          <option>Accessories</option>
+          <option>Other</option>
+
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Platform</label>
+
+        <select id="platform">
+
+          <option>Amazon</option>
+          <option>Flipkart</option>
+          <option>Meesho</option>
+          <option>eBay</option>
+          <option>Shopify</option>
+          <option>Other</option>
+
+        </select>
+      </div>
+
+      <div class="field full">
+
+        <label>Product Description</label>
+
+        <textarea
+          id="description"
+          placeholder="Write a short product description..."
+        ></textarea>
+
+      </div>
+
+      <div class="field full">
+
+        <label>Original Product URL</label>
+
+        <input
+          type="url"
+          id="productUrl"
+          placeholder="https://example.com/product"
+        />
+
+      </div>
+
+    </div>
+
+    <button class="generate" onclick="generateLink()">
+      ⚡ Generate Smart Product Link
+    </button>
+
+    <div class="result" id="result">
+
+      <h3>🎉 Your Smart Link is Ready</h3>
+
+      <div class="link-box">
+
+        <input
+          id="smartLink"
+          readonly
+        />
+
+        <button
+          class="copy"
+          onclick="copyLink()"
+        >
+          Copy
+        </button>
+
+      </div>
+
+      <div class="preview">
+
+        <h3 style="margin-bottom:15px;">
+          Product Page Preview
+        </h3>
+
+        <div class="preview-card">
+
+          <img
+            id="previewImage"
+            alt="Product"
+          />
+
+          <div class="preview-info">
+
+            <h2 id="previewName">
+              Product Name
+            </h2>
+
+            <div
+              class="price"
+              id="previewPrice"
+            >
+              ₹0
+            </div>
+
+            <p
+              id="previewDescription"
+              style="color:#6b7280;line-height:1.5;"
+            ></p>
+
+            <a
+              id="buyButton"
+              class="buy"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Buy Now →
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="features">
+
+  <div class="features-grid">
+
+    <div class="feature">
+      <div class="feature-icon">📸</div>
+      <h3>Product Upload</h3>
+      <p>
+        Upload a product photo and create your product page quickly.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🔗</div>
+      <h3>Smart Links</h3>
+      <p>
+        Create a clean shareable link for every product.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <h3>Analytics Ready</h3>
+      <p>
+        The platform is designed to add click tracking and analytics.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<footer>
+  © 2026 ClickLink AI — Upload. Create. Share. Earn.
+</footer>
+
+<script>
+
+  let uploadedImage = "";
+
+  const fileInput = document.getElementById("fileInput");
+
+  const imagePreview = document.getElementById("imagePreview");
+
+  fileInput.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+
+      uploadedImage = event.target.result;
+
+      imagePreview.src = uploadedImage;
+
+      imagePreview.style.display = "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+
+  function generateSlug(text) {
+
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  }
+
+
+  function generateLink() {
+
+    const name =
+      document.getElementById("productName").value.trim();
+
+    const price =
+      document.getElementById("price").value.trim();
+
+    const description =
+      document.getElementById("description").value.trim();
+
+    const productUrl =
+      document.getElementById("productUrl").value.trim();
+
+    if (!name) {
+
+      alert("Please enter the product name.");
+
+      return;
+
+    }
+
+    if (!productUrl) {
+
+      alert("Please enter the original product URL.");
+
+      return;
+
+    }
+
+    try {
+
+      new URL(productUrl);
+
+    } catch {
+
+      alert("Please enter a valid product URL.");
+
+      return;
+
+    }
+
+    const randomId =
+      Math.random().toString(36).substring(2, 8);
+
+    const slug =
+      generateSlug(name);
+
+    const currentUrl =
+      window.location.origin +
+      "/p/" +
+      slug +
+      "-" +
+      randomId;
+
+    document.getElementById("smartLink").value =
+      currentUrl;
+
+    document.getElementById("previewName").textContent =
+      name;
+
+    document.getElementById("previewPrice").textContent =
+      price ? "₹" + Number(price).toLocaleString("en-IN") : "Price not set";
+
+    document.getElementById("previewDescription").textContent =
+      description ||
+      "Discover this product through ClickLink AI.";
+
+    document.getElementById("buyButton").href =
+      productUrl;
+
+    if (uploadedImage) {
+
+      document.getElementById("previewImage").src =
+        uploadedImage;
+
+    } else {
+
+      document.getElementById("previewImage").src =
+        "https://via.placeholder.com/600x500?text=Product+Image";
+
+    }
+
+    document.getElementById("result").style.display =
+      "block";
+
+    document.getElementById("result").scrollIntoView({
+      behavior: "smooth"
+    });
+
+  }
+
+
+  function copyLink() {
+
+    const link =
+      document.getElementById("smartLink").value;
+
+    navigator.clipboard.writeText(link)
+      .then(function () {
+
+        const button =
+          document.querySelector(".copy");
+
+        button.textContent = "Copied!";
+
+        setTimeout(function () {
+
+          button.textContent = "Copy";
+
+        }, 1500);
+
+      });
+
+  }
+
+
+  function scrollToApp() {
+
+    document.getElementById("app")
+      .scrollIntoView({
+        behavior: "smooth"
+      });
+
+  }
+
+</script>
+
+</body>
+</html> 
