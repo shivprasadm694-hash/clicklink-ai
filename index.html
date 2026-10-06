@@ -1,531 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>ClickLink AI — Smart Product Links</title>
+  <title>ClickLink AI — Upload. Create. Share. Earn.</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,Helvetica,sans-serif;
-}
+    body {
+      background: #f5f7fb;
+      color: #111827;
+    }
 
-body{
-  background:#f7f7fb;
-  color:#111827;
-}
+    header {
+      height: 70px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6%;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-header{
-  background:#fff;
-  border-bottom:1px solid #e5e7eb;
-  padding:18px 6%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+      color: #111827;
+    }
 
-.logo{
-  font-size:24px;
-  font-weight:800;
-  color:#673de6;
-}
+    .logo span {
+      color: #635bff;
+    }
 
-.header-btn{
-  background:#673de6;
-  color:#fff;
-  text-decoration:none;
-  padding:11px 20px;
-  border-radius:10px;
-  font-weight:700;
-}
+    .login-btn {
+      text-decoration: none;
+      background: #111827;
+      color: white;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
 
-.hero{
-  text-align:center;
-  padding:75px 20px 45px;
-}
+    .hero {
+      text-align: center;
+      padding: 70px 20px 35px;
+    }
 
-.badge{
-  display:inline-block;
-  background:#eee9ff;
-  color:#673de6;
-  padding:8px 15px;
-  border-radius:30px;
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:.5px;
-  margin-bottom:18px;
-}
+    .badge {
+      display: inline-block;
+      background: #ede9fe;
+      color: #5b21b6;
+      padding: 8px 15px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
 
-.hero h1{
-  font-size:52px;
-  line-height:1.1;
-  max-width:800px;
-  margin:auto;
-}
+    .hero h1 {
+      font-size: 48px;
+      line-height: 1.1;
+      max-width: 850px;
+      margin: auto;
+    }
 
-.hero h1 span{
-  color:#673de6;
-}
+    .hero h1 span {
+      color: #635bff;
+    }
 
-.hero p{
-  max-width:650px;
-  margin:20px auto;
-  color:#6b7280;
-  font-size:18px;
-  line-height:1.6;
-}
+    .hero p {
+      max-width: 650px;
+      margin: 18px auto;
+      color: #6b7280;
+      font-size: 18px;
+      line-height: 1.6;
+    }
 
-.app{
-  max-width:900px;
-  margin:20px auto 80px;
-  padding:0 20px;
-}
+    .main {
+      width: 92%;
+      max-width: 900px;
+      margin: 25px auto 70px;
+    }
 
-.card{
-  background:#fff;
-  border-radius:22px;
-  padding:35px;
-  box-shadow:0 15px 45px rgba(0,0,0,.08);
-}
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+    }
 
-.card h2{
-  font-size:28px;
-  margin-bottom:8px;
-}
+    .upload-box {
+      border: 2px dashed #c7d2fe;
+      border-radius: 18px;
+      padding: 45px 20px;
+      text-align: center;
+      background: #fafaff;
+      cursor: pointer;
+      transition: 0.2s;
+    }
 
-.sub{
-  color:#6b7280;
-  margin-bottom:25px;
-}
+    .upload-box:hover {
+      border-color: #635bff;
+      background: #f5f3ff;
+    }
 
-.upload{
-  display:block;
-  border:2px dashed #cfc7f5;
-  border-radius:18px;
-  padding:35px;
-  text-align:center;
-  cursor:pointer;
-  background:#faf9ff;
-  margin-bottom:25px;
-}
+    .upload-icon {
+      font-size: 50px;
+      margin-bottom: 12px;
+    }
 
-.upload:hover{
-  border-color:#673de6;
-}
+    .upload-box h2 {
+      margin-bottom: 8px;
+    }
 
-.upload-icon{
-  font-size:42px;
-  margin-bottom:10px;
-}
+    .upload-box p {
+      color: #6b7280;
+      margin-bottom: 18px;
+    }
 
-.upload input{
-  display:none;
-}
+    .upload-btn {
+      display: inline-block;
+      background: #635bff;
+      color: white;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-.preview{
-  display:none;
-  text-align:center;
-  margin-bottom:25px;
-}
+    #photoInput {
+      display: none;
+    }
 
-.preview img{
-  max-width:260px;
-  max-height:260px;
-  border-radius:15px;
-  object-fit:cover;
-}
+    #preview {
+      display: none;
+      margin-top: 25px;
+      text-align: center;
+    }
 
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-}
+    #preview img {
+      width: 230px;
+      height: 230px;
+      object-fit: contain;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      background: white;
+    }
 
-.field{
-  display:flex;
-  flex-direction:column;
-}
+    .marketplaces {
+      margin-top: 30px;
+    }
 
-.field.full{
-  grid-column:1/-1;
-}
+    .marketplaces h3 {
+      margin-bottom: 15px;
+    }
 
-label{
-  font-weight:700;
-  margin-bottom:8px;
-  font-size:14px;
-}
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
 
-input,textarea,select{
-  width:100%;
-  padding:14px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:15px;
-  outline:none;
-}
+    .market {
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      background: white;
+      text-align: center;
+      font-weight: 700;
+      transition: 0.2s;
+    }
 
-input:focus,textarea:focus,select:focus{
-  border-color:#673de6;
-}
+    .market.active {
+      border-color: #635bff;
+      background: #f5f3ff;
+      color: #5b21b6;
+    }
 
-textarea{
-  min-height:120px;
-  resize:vertical;
-}
+    .market small {
+      display: block;
+      margin-top: 5px;
+      color: #6b7280;
+      font-weight: normal;
+    }
 
-.generate{
-  width:100%;
-  border:0;
-  margin-top:25px;
-  padding:16px;
-  border-radius:12px;
-  background:#673de6;
-  color:#fff;
-  font-size:17px;
-  font-weight:800;
-  cursor:pointer;
-}
+    .analyze-btn {
+      width: 100%;
+      border: none;
+      margin-top: 25px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #111827;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-.generate:hover{
-  background:#5630c9;
-}
+    .analyze-btn:hover {
+      background: #000000;
+    }
 
-.result{
-  display:none;
-  margin-top:30px;
-  padding:25px;
-  border-radius:16px;
-  background:#f3f0ff;
-}
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-.result h3{
-  margin-bottom:12px;
-}
+    .status {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      text-align: center;
+      color: #374151;
+    }
 
-.link-box{
-  display:flex;
-  gap:10px;
-}
+    .results {
+      display: none;
+      margin-top: 30px;
+    }
 
-.link-box input{
-  background:#fff;
-}
+    .results h2 {
+      margin-bottom: 15px;
+    }
 
-.copy{
-  border:0;
-  background:#111827;
-  color:#fff;
-  padding:0 18px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:700;
-}
+    .result-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      background: white;
+    }
 
-.product-preview{
-  margin-top:20px;
-  background:#fff;
-  padding:20px;
-  border-radius:15px;
-}
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
 
-.product-preview img{
-  width:180px;
-  height:180px;
-  object-fit:cover;
-  border-radius:12px;
-  display:block;
-  margin-bottom:15px;
-}
+    .result-name {
+      font-size: 17px;
+      font-weight: 700;
+    }
 
-.buy{
-  display:inline-block;
-  margin-top:15px;
-  background:#673de6;
-  color:#fff;
-  padding:12px 22px;
-  border-radius:9px;
-  text-decoration:none;
-  font-weight:700;
-}
+    .platform {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 5px;
+    }
 
-.features{
-  max-width:1100px;
-  margin:0 auto 80px;
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
+    .match {
+      color: #059669;
+      font-weight: 700;
+      white-space: nowrap;
+    }
 
-.feature{
-  background:#fff;
-  padding:25px;
-  border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,.05);
-}
+    .affiliate-btn {
+      display: inline-block;
+      margin-top: 14px;
+      background: #635bff;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-weight: 700;
+    }
 
-.feature h3{
-  margin-bottom:10px;
-}
+    .info {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: #1e40af;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-.feature p{
-  color:#6b7280;
-  line-height:1.5;
-}
+    footer {
+      text-align: center;
+      padding: 35px;
+      color: #6b7280;
+      font-size: 14px;
+    }
 
-footer{
-  text-align:center;
-  padding:30px;
-  background:#111827;
-  color:#9ca3af;
-}
+    @media(max-width:700px) {
+      .hero h1 {
+        font-size: 36px;
+      }
 
-@media(max-width:700px){
+      .market-grid {
+        grid-template-columns: 1fr;
+      }
 
-  .hero h1{
-    font-size:38px;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .field.full{
-    grid-column:auto;
-  }
-
-  .features{
-    grid-template-columns:1fr;
-  }
-
-  .card{
-    padding:22px;
-  }
-}
-</style>
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-
-  <div class="logo">
-    CLICKLINK AI
-  </div>
-
-  <a href="/auth.html" class="header-btn">
-    Login
-  </a>
-
+  <div class="logo">Click<span>Link</span> AI</div>
+  <a href="/auth.html" class="login-btn">Login / Sign Up</a>
 </header>
-
 
 <section class="hero">
 
   <div class="badge">
-    AI PRODUCT LINK PLATFORM
+    AI PRODUCT → MARKETPLACE LINK
   </div>
 
   <h1>
-    Turn Any Product Into a
-    <span>Smart Link.</span>
+    Upload a Product Photo.
+    <span>Get the Product Link.</span>
   </h1>
 
   <p>
-    Upload your product photo, add your product details,
-    and create a beautiful shareable product page in seconds.
+    Upload a photo of a product from Meesho, Amazon, Flipkart, eBay or
+    another marketplace. ClickLink AI identifies the product and finds
+    matching marketplace listings.
   </p>
 
 </section>
 
-
-<section class="app">
+<main class="main">
 
   <div class="card">
 
-    <h2>Create Your Product Link</h2>
+    <div class="upload-box" onclick="document.getElementById('photoInput').click()">
 
-    <p class="sub">
-      Start with your product photo. No original product URL required.
-    </p>
+      <div class="upload-icon">📸</div>
 
+      <h2>Upload Product Photo</h2>
 
-    <!-- PHOTO UPLOAD -->
-
-    <label class="upload" for="fileInput">
-
-      <div class="upload-icon">
-        📸
-      </div>
-
-      <strong>
-        Upload Product Photo
-      </strong>
-
-      <p style="color:#6b7280;margin-top:7px;">
-        JPG, PNG or WEBP
+      <p>
+        Upload a clear screenshot or product image
       </p>
+
+      <label class="upload-btn">
+        Choose Photo
+      </label>
 
       <input
         type="file"
-        id="fileInput"
+        id="photoInput"
         accept="image/*"
-      >
+      />
 
-    </label>
+    </div>
 
+    <div id="preview">
 
-    <!-- PHOTO PREVIEW -->
+      <h3>Selected Product</h3>
 
-    <div class="preview" id="preview">
+      <br>
 
-      <img id="previewImage" alt="Product preview">
+      <img id="previewImage" />
 
     </div>
 
 
-    <!-- PRODUCT DETAILS -->
+    <div class="marketplaces">
 
-    <div class="form-grid">
+      <h3>
+        Select Marketplaces
+      </h3>
 
-      <div class="field">
+      <div class="market-grid">
 
-        <label>
-          Product Name
-        </label>
-
-        <input
-          type="text"
-          id="productName"
-          placeholder="Example: Men's Premium Jacket"
+        <div
+          class="market active"
+          data-market="amazon"
+          onclick="toggleMarket(this)"
         >
+          🛒 Amazon
+          <small>Product matching</small>
+        </div>
 
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Price
-        </label>
-
-        <input
-          type="number"
-          id="productPrice"
-          placeholder="₹ 999"
+        <div
+          class="market active"
+          data-market="flipkart"
+          onclick="toggleMarket(this)"
         >
+          🛍️ Flipkart
+          <small>Product matching</small>
+        </div>
 
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Category
-        </label>
-
-        <select id="category">
-
-          <option value="">
-            Select Category
-          </option>
-
-          <option>
-            Men Clothing
-          </option>
-
-          <option>
-            Women Clothing
-          </option>
-
-          <option>
-            Shoes
-          </option>
-
-          <option>
-            Accessories
-          </option>
-
-          <option>
-            Beauty
-          </option>
-
-          <option>
-            Electronics
-          </option>
-
-          <option>
-            Other
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Selling Type
-        </label>
-
-        <select id="sellingType">
-
-          <option value="own">
-            My Own Product
-          </option>
-
-          <option value="affiliate">
-            Affiliate Product
-          </option>
-
-          <option value="reselling">
-            Reselling
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field full">
-
-        <label>
-          Product Description
-        </label>
-
-        <textarea
-          id="description"
-          placeholder="Write a short description of your product..."
-        ></textarea>
-
-      </div>
-
-
-      <div class="field full">
-
-        <label>
-          Buy / Order Link
-          <span style="font-weight:400;color:#888;">
-            (Optional)
-          </span>
-        </label>
-
-        <input
-          type="url"
-          id="buyUrl"
-          placeholder="https://example.com/product"
+        <div
+          class="market active"
+          data-market="ebay"
+          onclick="toggleMarket(this)"
         >
+          🌎 eBay
+          <small>Image search</small>
+        </div>
 
       </div>
 
@@ -533,92 +416,52 @@ footer{
 
 
     <button
-      class="generate"
-      onclick="generateLink()"
+      class="analyze-btn"
+      id="analyzeBtn"
+      onclick="findProducts()"
     >
-      ✨ Create Smart Product Link
+      🔎 Find Matching Products
     </button>
 
 
-    <!-- RESULT -->
+    <div
+      class="status"
+      id="status"
+    >
+      🤖 AI is analyzing your product...
+    </div>
+
 
     <div
-      class="result"
-      id="result"
+      class="results"
+      id="results"
     >
 
-      <h3>
-        🎉 Your Smart Product Link
-      </h3>
+      <h2>
+        Matching Products
+      </h2>
 
-      <div class="link-box">
+      <div id="resultList"></div>
 
-        <input
-          type="text"
-          id="generatedLink"
-          readonly
-        >
-
-        <button
-          class="copy"
-          onclick="copyLink()"
-        >
-          Copy
-        </button>
-
-      </div>
+    </div>
 
 
-      <div
-        class="product-preview"
-        id="productPreview"
-      ></div>
+    <div class="info">
+
+      <b>How ClickLink AI works:</b><br><br>
+
+      1. Upload product photo<br>
+      2. AI identifies the product<br>
+      3. ClickLink searches connected marketplaces<br>
+      4. Matching products are shown<br>
+      5. ClickLink creates a valid affiliate/deep link<br>
+      6. Share the link and earn when eligible purchases happen
 
     </div>
 
   </div>
 
-</section>
-
-
-<section class="features">
-
-  <div class="feature">
-
-    <h3>📸 Photo First</h3>
-
-    <p>
-      Start by uploading a product photo.
-      You don't need an original product URL.
-    </p>
-
-  </div>
-
-
-  <div class="feature">
-
-    <h3>🔗 Smart Links</h3>
-
-    <p>
-      Create attractive product pages
-      that are easy to share.
-    </p>
-
-  </div>
-
-
-  <div class="feature">
-
-    <h3>📊 Analytics</h3>
-
-    <p>
-      Track clicks and product performance
-      as your business grows.
-    </p>
-
-  </div>
-
-</section>
+</main>
 
 
 <footer>
@@ -630,268 +473,239 @@ footer{
 
 <script>
 
-/* =====================================
-   SUPABASE
-===================================== */
+const photoInput = document.getElementById("photoInput");
+const preview = document.getElementById("preview");
+const previewImage = document.getElementById("previewImage");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const statusBox = document.getElementById("status");
+const results = document.getElementById("results");
+const resultList = document.getElementById("resultList");
 
-const SUPABASE_URL =
-"https://sxvdtgwjktbzbbaprdyz.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_MY2ZBOkMQ5HQkHhg2au6eA_xzj7oct_";
-
-const { createClient } = supabase;
-
-const supabaseClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+let selectedFile = null;
 
 
-/* =====================================
-   PHOTO PREVIEW
-===================================== */
+/* PHOTO UPLOAD */
 
-let selectedImage = "";
+photoInput.addEventListener("change", function () {
 
-document
-  .getElementById("fileInput")
-  .addEventListener("change", function(event){
+  const file = this.files[0];
 
-    const file = event.target.files[0];
+  if (!file) return;
 
-    if(!file){
-      return;
-    }
+  selectedFile = file;
 
-    if(!file.type.startsWith("image/")){
-      alert("Please upload an image.");
-      return;
-    }
+  const reader = new FileReader();
 
-    const reader = new FileReader();
+  reader.onload = function (e) {
 
-    reader.onload = function(e){
+    previewImage.src = e.target.result;
 
-      selectedImage = e.target.result;
+    preview.style.display = "block";
 
-      document.getElementById("previewImage").src =
-        selectedImage;
+  };
 
-      document.getElementById("preview").style.display =
-        "block";
+  reader.readAsDataURL(file);
 
-    };
-
-    reader.readAsDataURL(file);
-
-  });
+});
 
 
-/* =====================================
-   CREATE SMART LINK
-===================================== */
+/* MARKETPLACE SELECT */
 
-async function generateLink(){
+function toggleMarket(element) {
 
-  const name =
-    document.getElementById("productName").value.trim();
+  element.classList.toggle("active");
 
-  const price =
-    document.getElementById("productPrice").value.trim();
-
-  const category =
-    document.getElementById("category").value;
-
-  const sellingType =
-    document.getElementById("sellingType").value;
-
-  const description =
-    document.getElementById("description").value.trim();
-
-  const buyUrl =
-    document.getElementById("buyUrl").value.trim();
+}
 
 
-  if(!selectedImage){
+/* FIND PRODUCTS */
 
-    alert("Please upload a product photo.");
+async function findProducts() {
+
+  if (!selectedFile) {
+
+    alert("Please upload a product photo first.");
 
     return;
 
   }
 
 
-  if(!name){
-
-    alert("Please enter product name.");
-
-    return;
-
-  }
+  const selectedMarkets =
+    [...document.querySelectorAll(".market.active")]
+    .map(el => el.dataset.market);
 
 
-  if(!price){
+  if (selectedMarkets.length === 0) {
 
-    alert("Please enter product price.");
+    alert("Please select at least one marketplace.");
 
     return;
 
   }
 
 
-  const button =
-    document.querySelector(".generate");
+  analyzeBtn.disabled = true;
 
-  button.disabled = true;
+  statusBox.style.display = "block";
 
-  button.textContent =
-    "Creating Smart Link...";
-
-
-  try{
-
-    const slug =
-      name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g,"-")
-        .replace(/^-|-$/g,"")
-        +
-        "-"
-        +
-        Math.random()
-          .toString(36)
-          .substring(2,8);
+  statusBox.innerHTML =
+    "🤖 AI is identifying your product...";
 
 
-    const link =
-      window.location.origin +
-      "/?product=" +
-      encodeURIComponent(slug);
+  results.style.display = "none";
+
+
+  try {
+
+    const formData = new FormData();
+
+    formData.append("image", selectedFile);
+
+    formData.append(
+      "marketplaces",
+      JSON.stringify(selectedMarkets)
+    );
 
 
     /*
-      Current MVP creates the smart-link preview.
-      Permanent database storage will be connected
-      after Storage + authenticated product flow.
+      REAL BACKEND ENDPOINT
+
+      Next step:
+      /api/match will connect AI + Amazon +
+      Flipkart + eBay marketplace APIs.
     */
 
+    const response = await fetch("/api/match", {
 
-    document.getElementById("generatedLink").value =
-      link;
+      method: "POST",
+
+      body: formData
+
+    });
 
 
-    document.getElementById("productPreview").innerHTML = `
+    if (!response.ok) {
 
-      <img
-        src="${selectedImage}"
-        alt="${escapeHtml(name)}"
-      >
+      throw new Error("API not ready");
 
-      <h3>
-        ${escapeHtml(name)}
-      </h3>
+    }
 
-      <p style="margin-top:8px;color:#673de6;font-weight:800;">
-        ₹${escapeHtml(price)}
-      </p>
 
-      <p style="margin-top:10px;color:#6b7280;">
-        ${escapeHtml(description || "Product available now.")}
-      </p>
+    const data = await response.json();
+
+    showResults(data.matches || []);
+
+
+  } catch (error) {
+
+    /*
+      Backend is not connected yet.
+      This message will disappear once
+      /api/match is implemented.
+    */
+
+    statusBox.innerHTML =
+      "⚙️ Marketplace matching engine is being connected. Next step: activate the AI + marketplace API.";
+
+    console.log(error);
+
+  }
+
+
+  analyzeBtn.disabled = false;
+
+}
+
+
+/* SHOW MATCHES */
+
+function showResults(matches) {
+
+  statusBox.style.display = "none";
+
+  results.style.display = "block";
+
+  resultList.innerHTML = "";
+
+
+  if (!matches.length) {
+
+    resultList.innerHTML = `
+      <div class="result-card">
+        No matching products found.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  matches.forEach(product => {
+
+    const card = document.createElement("div");
+
+    card.className = "result-card";
+
+
+    card.innerHTML = `
+
+      <div class="result-top">
+
+        <div>
+
+          <div class="result-name">
+            ${escapeHtml(product.title || "Product")}
+          </div>
+
+          <div class="platform">
+            ${escapeHtml(product.marketplace || "")}
+          </div>
+
+        </div>
+
+        <div class="match">
+          ${product.match || 0}% Match
+        </div>
+
+      </div>
+
 
       ${
-        buyUrl
+        product.url
         ?
         `<a
-          class="buy"
-          href="${escapeHtml(buyUrl)}"
+          href="${product.url}"
           target="_blank"
           rel="noopener noreferrer"
+          class="affiliate-btn"
         >
-          Buy Now
+          🔗 Open Product
         </a>`
         :
-        `<button
-          class="buy"
-          onclick="alert('Order link will be added when this product is connected to a selling platform.')"
-        >
-          Buy Now
-        </button>`
+        ""
       }
 
     `;
 
 
-    document.getElementById("result").style.display =
-      "block";
+    resultList.appendChild(card);
 
-
-    document.getElementById("result")
-      .scrollIntoView({
-        behavior:"smooth"
-      });
-
-
-  }catch(error){
-
-    alert(
-      "Something went wrong. Please try again."
-    );
-
-  }
-
-
-  button.disabled = false;
-
-  button.textContent =
-    "✨ Create Smart Product Link";
+  });
 
 }
 
 
-/* =====================================
-   COPY LINK
-===================================== */
+/* SECURITY */
 
-async function copyLink(){
+function escapeHtml(text) {
 
-  const input =
-    document.getElementById("generatedLink");
+  const div = document.createElement("div");
 
-  try{
+  div.textContent = text;
 
-    await navigator.clipboard.writeText(
-      input.value
-    );
-
-    alert("Smart Link copied!");
-
-  }catch(error){
-
-    input.select();
-
-    document.execCommand("copy");
-
-    alert("Smart Link copied!");
-
-  }
-
-}
-
-
-/* =====================================
-   SECURITY
-===================================== */
-
-function escapeHtml(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  return div.innerHTML;
 
 }
 
