@@ -6,243 +6,318 @@
 
   <title>ClickLink AI — Upload. Create. Share. Earn.</title>
 
+  <meta
+    name="description"
+    content="Upload a product photo and let ClickLink AI identify and find matching marketplace products."
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
     }
 
     body {
-      background: #f5f7fb;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #eef2ff 0%, transparent 35%),
+        linear-gradient(135deg, #f8fafc, #eef2ff);
       color: #111827;
+      min-height: 100vh;
     }
 
-    header {
-      height: 70px;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
+    button,
+    input {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1150px, 92%);
+      margin: auto;
+    }
+
+    /* NAVBAR */
+
+    nav {
+      height: 74px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 6%;
+      border-bottom: 1px solid #e5e7eb;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
     }
 
     .logo {
       font-size: 25px;
-      font-weight: 800;
+      font-weight: 900;
+      letter-spacing: -1px;
       color: #111827;
     }
 
     .logo span {
-      color: #635bff;
+      color: #6366f1;
     }
 
-    .login-btn {
-      text-decoration: none;
-      background: #111827;
-      color: white;
-      padding: 11px 20px;
-      border-radius: 10px;
-      font-weight: 600;
+    .nav-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
+
+    .nav-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      padding: 10px 17px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav-btn.primary {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: white;
+    }
+
+    /* HERO */
 
     .hero {
+      padding: 75px 0 35px;
       text-align: center;
-      padding: 70px 20px 35px;
     }
 
     .badge {
       display: inline-block;
-      background: #ede9fe;
-      color: #5b21b6;
-      padding: 8px 15px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-weight: 800;
+      font-size: 13px;
       margin-bottom: 18px;
     }
 
     .hero h1 {
-      font-size: 48px;
-      line-height: 1.1;
+      font-size: clamp(38px, 6vw, 70px);
+      line-height: 1.02;
+      letter-spacing: -3px;
       max-width: 850px;
       margin: auto;
     }
 
     .hero h1 span {
-      color: #635bff;
+      color: #6366f1;
     }
 
     .hero p {
       max-width: 650px;
-      margin: 18px auto;
-      color: #6b7280;
+      margin: 22px auto 0;
+      color: #64748b;
       font-size: 18px;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
-    .main {
-      width: 92%;
+    /* MAIN CARD */
+
+    .app-card {
       max-width: 900px;
-      margin: 25px auto 70px;
-    }
-
-    .card {
+      margin: 35px auto 80px;
       background: white;
       border: 1px solid #e5e7eb;
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 30px;
-      box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+      box-shadow: 0 25px 70px rgba(15,23,42,.08);
     }
 
-    .upload-box {
-      border: 2px dashed #c7d2fe;
-      border-radius: 18px;
-      padding: 45px 20px;
-      text-align: center;
-      background: #fafaff;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .upload-box:hover {
-      border-color: #635bff;
-      background: #f5f3ff;
-    }
-
-    .upload-icon {
-      font-size: 50px;
-      margin-bottom: 12px;
-    }
-
-    .upload-box h2 {
+    .section-title {
+      font-size: 21px;
+      font-weight: 900;
       margin-bottom: 8px;
     }
 
-    .upload-box p {
-      color: #6b7280;
-      margin-bottom: 18px;
+    .section-subtitle {
+      color: #64748b;
+      margin-bottom: 22px;
     }
 
-    .upload-btn {
-      display: inline-block;
-      background: #635bff;
-      color: white;
-      padding: 13px 22px;
-      border-radius: 10px;
-      font-weight: 700;
+    /* UPLOAD */
+
+    .upload-box {
+      border: 2px dashed #c7d2fe;
+      border-radius: 20px;
+      min-height: 270px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       cursor: pointer;
+      background: #f8faff;
+      transition: .2s;
+      overflow: hidden;
+      position: relative;
     }
 
-    #photoInput {
-      display: none;
+    .upload-box:hover {
+      border-color: #6366f1;
+      background: #f5f3ff;
+    }
+
+    .upload-content {
+      padding: 35px;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .upload-content h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .upload-content p {
+      color: #64748b;
+      font-size: 14px;
     }
 
     #preview {
       display: none;
-      margin-top: 25px;
-      text-align: center;
+      width: 100%;
+      max-height: 390px;
+      object-fit: contain;
+      background: #f8fafc;
     }
 
-    #preview img {
-      width: 230px;
-      height: 230px;
-      object-fit: contain;
-      border-radius: 16px;
-      border: 1px solid #e5e7eb;
-      background: white;
+    #imageInput {
+      display: none;
     }
+
+    /* MARKETPLACES */
 
     .marketplaces {
-      margin-top: 30px;
-    }
-
-    .marketplaces h3 {
-      margin-bottom: 15px;
-    }
-
-    .market-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .market {
-      border: 2px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 16px;
-      cursor: pointer;
-      background: white;
-      text-align: center;
-      font-weight: 700;
-      transition: 0.2s;
-    }
-
-    .market.active {
-      border-color: #635bff;
-      background: #f5f3ff;
-      color: #5b21b6;
-    }
-
-    .market small {
-      display: block;
-      margin-top: 5px;
-      color: #6b7280;
-      font-weight: normal;
-    }
-
-    .analyze-btn {
-      width: 100%;
-      border: none;
+      gap: 14px;
       margin-top: 25px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #111827;
+    }
+
+    .marketplace {
+      border: 2px solid #e5e7eb;
+      border-radius: 15px;
+      padding: 18px;
+      cursor: pointer;
+      text-align: center;
+      transition: .2s;
+      background: white;
+    }
+
+    .marketplace:hover {
+      border-color: #a5b4fc;
+    }
+
+    .marketplace.active {
+      border-color: #6366f1;
+      background: #eef2ff;
+    }
+
+    .marketplace-icon {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .marketplace-name {
+      font-weight: 900;
+    }
+
+    .marketplace-status {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 5px;
+    }
+
+    /* ACTION */
+
+    .action-btn {
+      width: 100%;
+      margin-top: 25px;
+      padding: 17px;
+      border: 0;
+      border-radius: 14px;
+      background: #6366f1;
       color: white;
       font-size: 17px;
-      font-weight: 700;
+      font-weight: 900;
       cursor: pointer;
+      transition: .2s;
     }
 
-    .analyze-btn:hover {
-      background: #000000;
+    .action-btn:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
     }
 
-    .analyze-btn:disabled {
-      opacity: 0.5;
+    .action-btn:disabled {
+      opacity: .6;
       cursor: not-allowed;
+      transform: none;
     }
+
+    /* STATUS */
 
     .status {
       display: none;
       margin-top: 20px;
       padding: 15px;
-      background: #f3f4f6;
       border-radius: 12px;
+      background: #f1f5f9;
+      color: #475569;
       text-align: center;
-      color: #374151;
+      font-weight: 700;
     }
 
-    .results {
+    .status.error {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .status.success {
+      background: #f0fdf4;
+      color: #15803d;
+    }
+
+    /* RESULTS */
+
+    #resultsSection {
       display: none;
-      margin-top: 30px;
+      margin-top: 35px;
     }
 
-    .results h2 {
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 15px;
+    }
+
+    .results-count {
+      color: #64748b;
+      font-size: 14px;
     }
 
     .result-card {
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 12px;
-      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 14px;
+      background: #fff;
     }
 
     .result-top {
@@ -251,62 +326,121 @@
       gap: 15px;
     }
 
-    .result-name {
-      font-size: 17px;
-      font-weight: 700;
+    .result-title {
+      font-weight: 900;
+      font-size: 18px;
     }
 
-    .platform {
-      font-size: 13px;
-      color: #6b7280;
-      margin-top: 5px;
+    .result-marketplace {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 9px;
+      background: #eef2ff;
+      color: #4f46e5;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .match {
-      color: #059669;
-      font-weight: 700;
+    .confidence {
+      font-weight: 900;
+      color: #16a34a;
       white-space: nowrap;
     }
 
-    .affiliate-btn {
-      display: inline-block;
+    .result-info {
       margin-top: 14px;
-      background: #635bff;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 9px;
-      text-decoration: none;
-      font-weight: 700;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.7;
     }
 
-    .info {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #eff6ff;
-      color: #1e40af;
+    .result-btn {
+      margin-top: 15px;
+      padding: 11px 17px;
+      border-radius: 10px;
+      border: 0;
+      background: #111827;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* HOW IT WORKS */
+
+    .how {
+      padding: 20px 0 80px;
+    }
+
+    .how h2 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 30px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 25px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eef2ff;
+      color: #4f46e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      margin-bottom: 15px;
+    }
+
+    .step h3 {
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      color: #64748b;
+      line-height: 1.6;
       font-size: 14px;
-      line-height: 1.5;
     }
 
     footer {
       text-align: center;
+      color: #94a3b8;
       padding: 35px;
-      color: #6b7280;
-      font-size: 14px;
+      border-top: 1px solid #e5e7eb;
     }
 
     @media(max-width:700px) {
-      .hero h1 {
-        font-size: 36px;
-      }
-
-      .market-grid {
+      .marketplaces,
+      .steps {
         grid-template-columns: 1fr;
       }
 
-      .card {
-        padding: 20px;
+      .app-card {
+        padding: 18px;
+      }
+
+      .hero {
+        padding-top: 50px;
+      }
+
+      .hero h1 {
+        letter-spacing: -2px;
+      }
+
+      .nav-right .nav-btn:first-child {
+        display: none;
       }
     }
   </style>
@@ -314,402 +448,904 @@
 
 <body>
 
-<header>
-  <div class="logo">Click<span>Link</span> AI</div>
-  <a href="/auth.html" class="login-btn">Login / Sign Up</a>
-</header>
+  <!-- NAVBAR -->
 
-<section class="hero">
+  <nav>
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <div class="logo">
+        Click<span>Link</span> AI
+      </div>
 
-  <div class="badge">
-    AI PRODUCT → MARKETPLACE LINK
-  </div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="location.href='auth.html'">
+          Login
+        </button>
 
-  <h1>
-    Upload a Product Photo.
-    <span>Get the Product Link.</span>
-  </h1>
+        <button class="nav-btn primary" onclick="location.href='auth.html'">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </nav>
 
-  <p>
-    Upload a photo of a product from Meesho, Amazon, Flipkart, eBay or
-    another marketplace. ClickLink AI identifies the product and finds
-    matching marketplace listings.
-  </p>
 
-</section>
+  <!-- HERO -->
 
-<main class="main">
+  <section class="hero">
+    <div class="container">
 
-  <div class="card">
+      <div class="badge">
+        AI PRODUCT MATCHING
+      </div>
 
-    <div class="upload-box" onclick="document.getElementById('photoInput').click()">
-
-      <div class="upload-icon">📸</div>
-
-      <h2>Upload Product Photo</h2>
+      <h1>
+        Upload a Photo.
+        <span>Find the Product.</span>
+      </h1>
 
       <p>
-        Upload a clear screenshot or product image
+        ClickLink AI helps affiliate marketers and resellers
+        identify products from photos and find matching products
+        across supported marketplaces.
       </p>
 
-      <label class="upload-btn">
-        Choose Photo
+    </div>
+  </section>
+
+
+  <!-- MAIN APP -->
+
+  <main class="container">
+
+    <div class="app-card">
+
+      <div class="section-title">
+        Find Your Product
+      </div>
+
+      <div class="section-subtitle">
+        Upload a clear product photo. ClickLink AI will analyze it.
+      </div>
+
+
+      <!-- IMAGE UPLOAD -->
+
+      <label class="upload-box" for="imageInput">
+
+        <div class="upload-content" id="uploadContent">
+
+          <div class="upload-icon">
+            📸
+          </div>
+
+          <h3>
+            Upload Product Photo
+          </h3>
+
+          <p>
+            Click here or drag & drop an image
+          </p>
+
+          <p style="margin-top:6px;">
+            JPG, PNG or WEBP
+          </p>
+
+        </div>
+
+        <img id="preview" alt="Product preview">
+
       </label>
 
       <input
+        id="imageInput"
         type="file"
-        id="photoInput"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/webp"
       />
 
-    </div>
 
-    <div id="preview">
+      <!-- MARKETPLACE SELECTION -->
 
-      <h3>Selected Product</h3>
+      <div style="margin-top:30px;">
 
-      <br>
-
-      <img id="previewImage" />
-
-    </div>
-
-
-    <div class="marketplaces">
-
-      <h3>
-        Select Marketplaces
-      </h3>
-
-      <div class="market-grid">
-
-        <div
-          class="market active"
-          data-market="amazon"
-          onclick="toggleMarket(this)"
-        >
-          🛒 Amazon
-          <small>Product matching</small>
+        <div class="section-title">
+          Search Marketplaces
         </div>
 
-        <div
-          class="market active"
-          data-market="flipkart"
-          onclick="toggleMarket(this)"
-        >
-          🛍️ Flipkart
-          <small>Product matching</small>
+        <div class="section-subtitle">
+          Select where ClickLink AI should look for matching products.
         </div>
 
-        <div
-          class="market active"
-          data-market="ebay"
-          onclick="toggleMarket(this)"
-        >
-          🌎 eBay
-          <small>Image search</small>
+        <div class="marketplaces">
+
+          <div
+            class="marketplace active"
+            data-marketplace="amazon"
+            onclick="toggleMarketplace(this)"
+          >
+            <div class="marketplace-icon">🛒</div>
+            <div class="marketplace-name">Amazon</div>
+            <div class="marketplace-status">
+              Matching ready
+            </div>
+          </div>
+
+          <div
+            class="marketplace active"
+            data-marketplace="flipkart"
+            onclick="toggleMarketplace(this)"
+          >
+            <div class="marketplace-icon">🛍️</div>
+            <div class="marketplace-name">Flipkart</div>
+            <div class="marketplace-status">
+              Matching ready
+            </div>
+          </div>
+
+          <div
+            class="marketplace active"
+            data-marketplace="ebay"
+            onclick="toggleMarketplace(this)"
+          >
+            <div class="marketplace-icon">🌎</div>
+            <div class="marketplace-name">eBay</div>
+            <div class="marketplace-status">
+              Matching ready
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTION -->
+
+      <button
+        id="findButton"
+        class="action-btn"
+        onclick="findProducts()"
+      >
+        Find Matching Products
+      </button>
+
+
+      <!-- STATUS -->
+
+      <div id="status" class="status"></div>
+
+
+      <!-- RESULTS -->
+
+      <section id="resultsSection">
+
+        <div class="results-header">
+
+          <div>
+            <div class="section-title">
+              Matching Products
+            </div>
+
+            <div class="results-count" id="resultsCount">
+              0 matches
+            </div>
+          </div>
+
+        </div>
+
+        <div id="results"></div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <!-- HOW IT WORKS -->
+
+  <section class="how">
+
+    <div class="container">
+
+      <h2>
+        How ClickLink AI Works
+      </h2>
+
+      <div class="steps">
+
+        <div class="step">
+
+          <div class="step-number">
+            1
+          </div>
+
+          <h3>
+            Upload
+          </h3>
+
+          <p>
+            Upload a photo of the product you want to find.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="step-number">
+            2
+          </div>
+
+          <h3>
+            AI Identifies
+          </h3>
+
+          <p>
+            AI analyzes the image and extracts useful product
+            information such as category, brand, color and keywords.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="step-number">
+            3
+          </div>
+
+          <h3>
+            Match & Share
+          </h3>
+
+          <p>
+            ClickLink AI will connect the identified product with
+            supported marketplace matching and affiliate systems.
+          </p>
+
         </div>
 
       </div>
 
     </div>
 
+  </section>
 
-    <button
-      class="analyze-btn"
-      id="analyzeBtn"
-      onclick="findProducts()"
-    >
-      🔎 Find Matching Products
-    </button>
 
+  <footer>
+    © 2026 ClickLink AI — Upload. Create. Share. Earn.
+  </footer>
 
-    <div
-      class="status"
-      id="status"
-    >
-      🤖 AI is analyzing your product...
-    </div>
 
-
-    <div
-      class="results"
-      id="results"
-    >
-
-      <h2>
-        Matching Products
-      </h2>
-
-      <div id="resultList"></div>
-
-    </div>
-
-
-    <div class="info">
-
-      <b>How ClickLink AI works:</b><br><br>
-
-      1. Upload product photo<br>
-      2. AI identifies the product<br>
-      3. ClickLink searches connected marketplaces<br>
-      4. Matching products are shown<br>
-      5. ClickLink creates a valid affiliate/deep link<br>
-      6. Share the link and earn when eligible purchases happen
-
-    </div>
-
-  </div>
-
-</main>
-
-
-<footer>
-
-  © 2026 ClickLink AI — Upload. Create. Share. Earn.
-
-</footer>
-
-
-<script>
-
-const photoInput = document.getElementById("photoInput");
-const preview = document.getElementById("preview");
-const previewImage = document.getElementById("previewImage");
-const analyzeBtn = document.getElementById("analyzeBtn");
-const statusBox = document.getElementById("status");
-const results = document.getElementById("results");
-const resultList = document.getElementById("resultList");
-
-let selectedFile = null;
-
-
-/* PHOTO UPLOAD */
-
-photoInput.addEventListener("change", function () {
-
-  const file = this.files[0];
-
-  if (!file) return;
-
-  selectedFile = file;
-
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-
-    previewImage.src = e.target.result;
-
-    preview.style.display = "block";
-
-  };
-
-  reader.readAsDataURL(file);
-
-});
-
-
-/* MARKETPLACE SELECT */
-
-function toggleMarket(element) {
-
-  element.classList.toggle("active");
-
-}
-
-
-/* FIND PRODUCTS */
-
-async function findProducts() {
-
-  if (!selectedFile) {
-
-    alert("Please upload a product photo first.");
-
-    return;
-
-  }
-
-
-  const selectedMarkets =
-    [...document.querySelectorAll(".market.active")]
-    .map(el => el.dataset.market);
-
-
-  if (selectedMarkets.length === 0) {
-
-    alert("Please select at least one marketplace.");
-
-    return;
-
-  }
-
-
-  analyzeBtn.disabled = true;
-
-  statusBox.style.display = "block";
-
-  statusBox.innerHTML =
-    "🤖 AI is identifying your product...";
-
-
-  results.style.display = "none";
-
-
-  try {
-
-    const formData = new FormData();
-
-    formData.append("image", selectedFile);
-
-    formData.append(
-      "marketplaces",
-      JSON.stringify(selectedMarkets)
-    );
-
+  <script>
 
     /*
-      REAL BACKEND ENDPOINT
-
-      Next step:
-      /api/match will connect AI + Amazon +
-      Flipkart + eBay marketplace APIs.
+      CLICKLINK AI
+      Frontend configuration
     */
 
-    const response = await fetch("/api/match", {
+    const SUPABASE_URL =
+      "https://sxvdtgwjktbzbbaprdyz.supabase.co";
 
-      method: "POST",
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_MY2ZBOkMQ5HQkHhg2au6eA_xzj7oct_";
 
-      body: formData
+    let supabaseClient = null;
 
-    });
+    try {
 
+      if (
+        window.supabase &&
+        SUPABASE_URL &&
+        SUPABASE_ANON_KEY
+      ) {
 
-    if (!response.ok) {
+        supabaseClient =
+          window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+          );
 
-      throw new Error("API not ready");
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Supabase initialization error:",
+        error
+      );
 
     }
 
 
-    const data = await response.json();
+    let selectedImage = null;
 
-    showResults(data.matches || []);
-
-
-  } catch (error) {
 
     /*
-      Backend is not connected yet.
-      This message will disappear once
-      /api/match is implemented.
+      IMAGE SELECT
     */
 
-    statusBox.innerHTML =
-      "⚙️ Marketplace matching engine is being connected. Next step: activate the AI + marketplace API.";
+    document
+      .getElementById("imageInput")
+      .addEventListener("change", function(event) {
 
-    console.log(error);
+        const file = event.target.files[0];
 
-  }
+        if (!file) {
+          return;
+        }
 
+        if (!file.type.startsWith("image/")) {
 
-  analyzeBtn.disabled = false;
+          showStatus(
+            "Please select a valid image.",
+            "error"
+          );
 
-}
+          return;
+        }
 
+        selectedImage = file;
 
-/* SHOW MATCHES */
+        const reader = new FileReader();
 
-function showResults(matches) {
+        reader.onload = function(e) {
 
-  statusBox.style.display = "none";
+          const preview =
+            document.getElementById("preview");
 
-  results.style.display = "block";
+          const uploadContent =
+            document.getElementById("uploadContent");
 
-  resultList.innerHTML = "";
+          preview.src = e.target.result;
 
+          preview.style.display = "block";
 
-  if (!matches.length) {
+          uploadContent.style.display = "none";
 
-    resultList.innerHTML = `
-      <div class="result-card">
-        No matching products found.
-      </div>
-    `;
+        };
 
-    return;
+        reader.readAsDataURL(file);
 
-  }
-
-
-  matches.forEach(product => {
-
-    const card = document.createElement("div");
-
-    card.className = "result-card";
-
-
-    card.innerHTML = `
-
-      <div class="result-top">
-
-        <div>
-
-          <div class="result-name">
-            ${escapeHtml(product.title || "Product")}
-          </div>
-
-          <div class="platform">
-            ${escapeHtml(product.marketplace || "")}
-          </div>
-
-        </div>
-
-        <div class="match">
-          ${product.match || 0}% Match
-        </div>
-
-      </div>
+      });
 
 
-      ${
-        product.url
-        ?
-        `<a
-          href="${product.url}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="affiliate-btn"
-        >
-          🔗 Open Product
-        </a>`
-        :
-        ""
+    /*
+      MARKETPLACE TOGGLE
+    */
+
+    function toggleMarketplace(element) {
+
+      element.classList.toggle("active");
+
+    }
+
+
+    /*
+      GET SELECTED MARKETPLACES
+    */
+
+    function getSelectedMarketplaces() {
+
+      return Array.from(
+        document.querySelectorAll(
+          ".marketplace.active"
+        )
+      ).map(
+        element =>
+          element.dataset.marketplace
+      );
+
+    }
+
+
+    /*
+      STATUS
+    */
+
+    function showStatus(message, type = "") {
+
+      const status =
+        document.getElementById("status");
+
+      status.textContent = message;
+
+      status.className = "status";
+
+      if (type) {
+        status.classList.add(type);
       }
 
-    `;
+      status.style.display = "block";
+
+    }
 
 
-    resultList.appendChild(card);
+    function hideStatus() {
 
-  });
+      document.getElementById(
+        "status"
+      ).style.display = "none";
 
-}
+    }
 
 
-/* SECURITY */
+    /*
+      IMAGE → BASE64
+    */
 
-function escapeHtml(text) {
+    function fileToBase64(file) {
 
-  const div = document.createElement("div");
+      return new Promise(
+        (resolve, reject) => {
 
-  div.textContent = text;
+          const reader =
+            new FileReader();
 
-  return div.innerHTML;
+          reader.onload = () =>
+            resolve(reader.result);
 
-}
+          reader.onerror = reject;
 
-</script>
+          reader.readAsDataURL(file);
+
+        }
+      );
+
+    }
+
+
+    /*
+      MAIN PRODUCT SEARCH
+    */
+
+    async function findProducts() {
+
+      const button =
+        document.getElementById(
+          "findButton"
+        );
+
+      hideStatus();
+
+      if (!selectedImage) {
+
+        showStatus(
+          "Please upload a product photo first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const marketplaces =
+        getSelectedMarketplaces();
+
+
+      if (marketplaces.length === 0) {
+
+        showStatus(
+          "Please select at least one marketplace.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        button.disabled = true;
+
+        button.textContent =
+          "AI is analyzing the product...";
+
+
+        showStatus(
+          "Uploading image and identifying product..."
+        );
+
+
+        /*
+          Convert image to Base64.
+        */
+
+        const imageData =
+          await fileToBase64(
+            selectedImage
+          );
+
+
+        /*
+          Send image to secure backend.
+          OPENAI_API_KEY never goes into frontend.
+        */
+
+        const identifyResponse =
+          await fetch(
+            "/api/identify",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                image: imageData
+              })
+
+            }
+          );
+
+
+        const identifyData =
+          await identifyResponse.json();
+
+
+        if (!identifyResponse.ok) {
+
+          throw new Error(
+            identifyData.error ||
+            "AI identification failed."
+          );
+
+        }
+
+
+        if (
+          !identifyData.product
+        ) {
+
+          throw new Error(
+            "AI could not identify the product."
+          );
+
+        }
+
+
+        const product =
+          identifyData.product;
+
+
+        showStatus(
+          "Product identified. Preparing marketplace matching..."
+        );
+
+
+        /*
+          Send AI result to marketplace matcher.
+        */
+
+        const matchResponse =
+          await fetch(
+            "/api/match",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                product,
+
+                marketplaces
+
+              })
+
+            }
+          );
+
+
+        const matchData =
+          await matchResponse.json();
+
+
+        if (!matchResponse.ok) {
+
+          throw new Error(
+            matchData.error ||
+            "Marketplace matching failed."
+          );
+
+        }
+
+
+        /*
+          Show matches.
+        */
+
+        const matches =
+          Array.isArray(
+            matchData.matches
+          )
+            ? matchData.matches
+            : [];
+
+
+        /*
+          If marketplace APIs are not
+          connected yet, still show the
+          AI identification result.
+        */
+
+        if (matches.length === 0) {
+
+          showResults([
+
+            {
+
+              title:
+                product.product_name ||
+                "Product identified",
+
+              marketplace:
+                "AI Identification",
+
+              match:
+                "AI identified",
+
+              brand:
+                product.brand || "Unknown",
+
+              category:
+                product.category || "Unknown",
+
+              color:
+                product.color || "Unknown",
+
+              search_query:
+                product.search_query || "",
+
+              url:
+                ""
+
+            }
+
+          ]);
+
+          showStatus(
+            "Product identified successfully.",
+            "success"
+          );
+
+        } else {
+
+          showResults(matches);
+
+          showStatus(
+            "Matching products found.",
+            "success"
+          );
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "CLICKLINK ERROR:",
+          error
+        );
+
+        showStatus(
+          error.message ||
+          "Something went wrong. Please try again.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Find Matching Products";
+
+      }
+
+    }
+
+
+    /*
+      RESULTS UI
+    */
+
+    function showResults(matches) {
+
+      const section =
+        document.getElementById(
+          "resultsSection"
+        );
+
+      const results =
+        document.getElementById(
+          "results"
+        );
+
+      const count =
+        document.getElementById(
+          "resultsCount"
+        );
+
+
+      results.innerHTML = "";
+
+
+      count.textContent =
+        `${matches.length} ${
+          matches.length === 1
+            ? "match"
+            : "matches"
+        }`;
+
+
+      matches.forEach(
+        (product) => {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+          card.className =
+            "result-card";
+
+
+          const title =
+            escapeHtml(
+              product.title ||
+              product.product_name ||
+              "Product"
+            );
+
+
+          const marketplace =
+            escapeHtml(
+              product.marketplace ||
+              "Marketplace"
+            );
+
+
+          const confidence =
+            escapeHtml(
+              product.match ||
+              product.confidence ||
+              "Matched"
+            );
+
+
+          const brand =
+            escapeHtml(
+              product.brand ||
+              "Unknown"
+            );
+
+
+          const category =
+            escapeHtml(
+              product.category ||
+              "Unknown"
+            );
+
+
+          const color =
+            escapeHtml(
+              product.color ||
+              "Unknown"
+            );
+
+
+          card.innerHTML = `
+
+            <div class="result-top">
+
+              <div>
+
+                <div class="result-title">
+                  ${title}
+                </div>
+
+                <div class="result-marketplace">
+                  ${marketplace}
+                </div>
+
+              </div>
+
+              <div class="confidence">
+                ${confidence}
+              </div>
+
+            </div>
+
+
+            <div class="result-info">
+
+              <strong>Brand:</strong>
+              ${brand}
+
+              <br>
+
+              <strong>Category:</strong>
+              ${category}
+
+              <br>
+
+              <strong>Color:</strong>
+              ${color}
+
+            </div>
+
+            ${
+              product.url
+                ? `
+                  <button
+                    class="result-btn"
+                    onclick="window.open(
+                      '${escapeAttribute(product.url)}',
+                      '_blank'
+                    )"
+                  >
+                    Open Product
+                  </button>
+                `
+                : ""
+            }
+
+          `;
+
+
+          results.appendChild(
+            card
+          );
+
+        }
+      );
+
+
+      section.style.display =
+        "block";
+
+
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
+
+
+    /*
+      SECURITY HELPERS
+    */
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    function escapeAttribute(value) {
+
+      return String(value)
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'");
+
+    }
+
+  </script>
 
 </body>
 </html>
