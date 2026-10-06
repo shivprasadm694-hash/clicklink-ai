@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
+      success: false,
       error: "Method not allowed"
     });
   }
@@ -10,14 +11,16 @@ export default async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
+        success: false,
         error: "OPENAI_API_KEY is not configured"
       });
     }
 
-    const { image } = req.body;
+    const { image } = req.body || {};
 
-    if (!image) {
+    if (!image || typeof image !== "string") {
       return res.status(400).json({
+        success: false,
         error: "Product image is required"
       });
     }
@@ -33,7 +36,7 @@ export default async function handler(req, res) {
         },
 
         body: JSON.stringify({
-          model: "gpt-5.6",
+          model: "gpt-6-luna",
 
           input: [
             {
@@ -44,9 +47,15 @@ export default async function handler(req, res) {
                   type: "input_text",
 
                   text: `
-Identify the product in this image.
+You are ClickLink AI's product identification engine.
 
-Return ONLY valid JSON in this format:
+Analyze the uploaded ecommerce product image.
+
+Identify the product as accurately as possible.
+
+Return ONLY valid JSON.
+
+Use exactly this structure:
 
 {
   "product_name": "",
@@ -56,17 +65,26 @@ Return ONLY valid JSON in this format:
   "color": "",
   "gender": "",
   "keywords": [],
-  "search_query": ""
+  "search_query": "",
+  "confidence": 0
 }
 
-Do not invent a brand if it cannot be identified.
-The search_query should be useful for finding the same or closest product on ecommerce marketplaces.
+Rules:
+
+- Do not invent a brand.
+- If the brand cannot be identified, return an empty string.
+- Identify visible product characteristics.
+- The search_query must be useful for searching the same or closest product on ecommerce marketplaces.
+- keywords must contain useful marketplace search terms.
+- confidence must be a number from 0 to 100.
+- Do not include explanations outside the JSON.
 `
                 },
 
                 {
                   type: "input_image",
-                  image_url: image
+                  image_url: image,
+                  detail: "high"
                 }
               ]
             }
@@ -78,33 +96,36 @@ The search_query should be useful for finding the same or closest product on eco
     const data = await response.json();
 
     if (!response.ok) {
-      console.error(data);
+      console.error("OPENAI ERROR:", data);
 
       return res.status(response.status).json({
+        success: false,
         error: "AI identification failed",
         details: data
       });
     }
 
-    const outputText =
-      data.output_text ||
-      "";
+    const outputText = data.output_text || "";
+
+    if (!outputText) {
+      return res.status(500).json({
+        success: false,
+        error: "AI returned an empty response"
+      });
+    }
 
     let product;
 
     try {
       product = JSON.parse(outputText);
-    } catch {
-      product = {
-        product_name: outputText,
-        brand: "",
-        category: "",
-        subcategory: "",
-        color: "",
-        gender: "",
-        keywords: [],
-        search_query: outputText
-      };
+    } catch (parseError) {
+      console.error("JSON PARSE ERROR:", parseError);
+
+      return res.status(500).json({
+        success: false,
+        error: "AI returned invalid product data",
+        raw: outputText
+      });
     }
 
     return res.status(200).json({
@@ -113,12 +134,11 @@ The search_query should be useful for finding the same or closest product on eco
     });
 
   } catch (error) {
-
-    console.error(error);
+    console.error("CLICKLINK IDENTIFY ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      error: "Server error"
+      error: "Server error while identifying product"
     });
   }
 }
